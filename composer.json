@@ -1,0 +1,27 @@
+{
+    "name": "radphp/stuff",
+    "type": "stuff",
+    "license": "MIT",
+    "description": "All kind of stuff, used in RadPHP bundles",
+    "keywords": ["RadPHP", "stuff"],
+    "authors": [
+        {
+            "name": "Mohammad Abdoli Rad",
+            "email": "m.abdolirad@gmail.com",
+            "role": "Project Founder"
+        },
+        {
+            "name": "Omid Mottaghi Rad",
+            "email": "omidmr@gmail.com",
+            "role": "Project Founder"
+        }
+    ],
+    "require-dev": {
+        "composer/composer": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rad\\Stuff\\": "src"
+        }
+    }
+}
