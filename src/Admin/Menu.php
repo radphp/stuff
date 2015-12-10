@@ -2,6 +2,9 @@
 
 namespace Rad\Stuff\Admin;
 
+use Rad\Authentication\Auth;
+use Rad\Authorization\Rbac;
+use Rad\DependencyInjection\Container;
 use Rad\Events\EventManagerTrait;
 
 class Menu
@@ -13,6 +16,7 @@ class Menu
     private $link = '#';
     private $order = 100;
     private $children = [];
+    private $resources = [];
 
     /** @var array $menu admin menu */
     private static $menu = [];
@@ -37,6 +41,10 @@ class Menu
 
         /** @var Menu $item */
         foreach (self::$menu as $item) {
+            if ($item->resources && !self::userHasResource($item->resources)) {
+                continue;
+            }
+
             if ($children = $item->getChildren()) {
                 $subItems = '';
 
@@ -45,6 +53,10 @@ class Menu
 
                 /** @var Menu $child */
                 foreach ($children as $child) {
+                    if ($child->resources && !self::userHasResource($child->resources)) {
+                        continue;
+                    }
+
                     $subItems .= '<li><a href="' . $child->getLink() . '">' . $child->getLabel() . '</a></li>';
                 }
 
@@ -199,5 +211,56 @@ class Menu
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * Get resources
+     *
+     * @return array
+     */
+    public function getResources()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * Set resources
+     *
+     * @param array $resources
+     *
+     * @return $this
+     */
+    public function setResources($resources)
+    {
+        $this->resources = $resources;
+
+        return $this;
+    }
+
+    /**
+     * If user has at least ONE resource of the resources, return TRUE
+     * @param $resources
+     *
+     * @return bool
+     */
+    private static function userHasResource($resources)
+    {
+        $container = Container::getInstance();
+
+        /** @var Rbac $rbac */
+        $rbac = $container->get('rbac');
+
+        /** @var Auth $auth */
+        $auth = $container->get('auth');
+
+        foreach($resources as $resource){
+            foreach ($auth->getStorage()->read()['roles'] as $roleName) {
+                if (true === $rbac->isGranted($roleName, $resource)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
