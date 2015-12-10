@@ -245,6 +245,10 @@ class Menu
      */
     private static function userHasResource($resources)
     {
+        if (!is_array($resources)) {
+            $resources = [$resources];
+        }
+
         $container = Container::getInstance();
 
         /** @var Rbac $rbac */
